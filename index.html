@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f6b5c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="مستر سقاو">
+<title>مراجعة البرمجة أولى ثانوي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&family=Readex+Pro:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* لوحة: حبر أخضر مزرق عميق + زعفراني للتمييز. تخطيط: عمود واحد للموبايل، كروت بنفس الحواف */
+:root{
+  --bg:#f4f6f5; --card:#ffffff; --ink:#15302c; --muted:#5b6f6a; --line:#d8e1de;
+  --accent:#0f6b5c; --accent-ink:#ffffff; --gold:#c98a12; --good:#1d7a3e; --bad:#b4372b;
+  --code-bg:#10231f; --code-ink:#e3f1ec;
+  --f-body:"IBM Plex Sans Arabic",Tahoma,Arial,sans-serif; --f-display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --f-mono:"IBM Plex Mono",Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1715; --card:#14221f; --ink:#e4eeeb; --muted:#93a8a2; --line:#24372f;
+  --accent:#3fb8a1; --accent-ink:#06211c; --gold:#e3a93a; --good:#5cc47f; --bad:#ef7a6c;
+  --code-bg:#07110f; --code-ink:#d9efe8; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0d1715; --card:#14221f; --ink:#e4eeeb; --muted:#93a8a2; --line:#24372f;
+  --accent:#3fb8a1; --accent-ink:#06211c; --gold:#e3a93a; --good:#5cc47f; --bad:#ef7a6c;
+  --code-bg:#07110f; --code-ink:#d9efe8; color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6}
+main{max-width:640px;margin:0 auto;padding:16px 16px 48px;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-direction:column;gap:4px;padding-top:6px}
+h1{font-family:var(--f-display);font-size:1.45rem;margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-size:1.15rem;margin:0 0 8px}
+.sub{color:var(--muted);font-size:.92rem;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{display:flex;flex-direction:column;gap:2px;text-align:start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;font:inherit;color:inherit;cursor:pointer}
+.tile b{font-family:var(--f-display);font-size:1.05rem}
+.tile span{color:var(--muted);font-size:.86rem}
+.tile.main{grid-column:1/-1;background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tile.main span{color:inherit;opacity:.85}
+button,.btn{font:inherit;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 14px;cursor:pointer}
+.btn-p{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+button:focus-visible,.tile:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+label{font-size:.9rem;color:var(--muted)}
+.chip{display:inline-block;font-size:.8rem;padding:2px 10px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+.chip.gold{color:var(--gold);border-color:var(--gold)}
+.bar{height:8px;background:var(--bg);border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:var(--accent)}
+.prog{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;font-size:.88rem}
+.prog .n{font-variant-numeric:tabular-nums;color:var(--muted)}
+pre.code{direction:ltr;text-align:left;background:var(--code-bg);color:var(--code-ink);font-family:var(--f-mono);font-size:.92rem;padding:12px 14px;border-radius:10px;overflow-x:auto;margin:8px 0;unicode-bidi:isolate}
+.q{font-weight:500;font-size:1.05rem}
+.opts{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.opt{text-align:start;padding:12px 14px;border-radius:12px;white-space:pre-wrap}
+.opt.mono{direction:ltr;text-align:left;font-family:var(--f-mono)}
+.opt.ok{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--card))}
+.opt.no{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--card))}
+.fb{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--bg);font-size:.95rem}
+.fb.ok b{color:var(--good)} .fb.no b{color:var(--bad)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.9rem;color:var(--muted)}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;color:var(--gold)}
+.big{font-family:var(--f-display);font-size:2.4rem;font-variant-numeric:tabular-nums;margin:0}
+.out{direction:ltr;text-align:left;font-family:var(--f-mono);background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:10px 12px;min-height:3em;white-space:pre-wrap;margin:0}
+.out .err{color:#ff9f93}
+textarea.ed{direction:ltr;text-align:left;font-family:var(--f-mono);min-height:170px;background:var(--code-bg);color:var(--code-ink);border-color:var(--code-bg)}
+.hide{display:none!important}
+.by{margin:2px 0 0;font-size:.85rem;font-weight:700;color:var(--gold)}
+.foot{text-align:center;font-size:.85rem;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:8px}
+.note{font-size:.85rem;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:380px){.tiles{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .2s}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>مراجعة البرمجة والذكاء الاصطناعي</h1>
+  <p class="sub">الصف الأول الثانوي · الكتاب الدراسي (6 فصول) + منصة كيريو JavaScript</p>
+  <p class="by" data-by></p>
+</header>
+
+<!-- الدخول: اسم الطالبة -->
+<section id="vName" class="card hide">
+  <h2>أهلًا! اكتبي اسمك الأول</h2>
+  <form id="nameForm" class="row">
+    <input id="nameIn" placeholder="مثلًا: منة أحمد" autocomplete="name">
+    <button class="btn-p" type="submit">ابدأي</button>
+  </form>
+  <p class="note">الاسم بيتحفظ على موبايلك بس، علشان يظهر في النتيجة اللي بتبعتيها للمستر.</p>
+</section>
+
+<!-- الرئيسية -->
+<section id="vHome" class="hide" style="display:flex;flex-direction:column;gap:14px">
+  <div class="row" style="justify-content:space-between">
+    <div><span id="hello" style="font-weight:700"></span> <span id="streak" class="chip gold"></span></div>
+    <button id="chg" type="button" class="note" style="border:none;background:none;padding:4px">تغيير الاسم</button>
+  </div>
+  <div class="tiles">
+    <button class="tile main" id="tDaily" type="button"><b>مراجعة سريعة · 5 أسئلة</b><span id="dailyState">دقيقتين بس، والأسئلة بتركز على الفصول اللي محتاجاها</span></button>
+    <button class="tile" id="tExam" type="button"><b>امتحان تجريبي</b><span>20 سؤال · 20 دقيقة</span></button>
+    <button class="tile" id="tPractice" type="button"><b>تدريب بالفصل</b><span>اختاري فصل وحلّي أسئلته</span></button>
+    <button class="tile" id="tCode" type="button"><b>جرّبي الكود</b><span>اكتبي JavaScript وشوفي الناتج</span></button>
+    <button class="tile" id="tSend" type="button"><b>ابعتي نتيجتك</b><span>للمستر على واتساب</span></button>
+  </div>
+  <div class="card">
+    <h2>مستواكي في كل جزء</h2>
+    <div id="progBook" class="prog"></div>
+    <p class="note" style="margin:10px 0 4px">البرمجة (فصول كيريو):</p>
+    <div id="progCode" class="prog"></div>
+  </div>
+</section>
+
+<!-- اختيار الفصل -->
+<section id="vPick" class="card hide">
+  <h2>اختاري الفصل</h2>
+  <label for="pickSel">الفصل</label>
+  <select id="pickSel"></select>
+  <div class="row" style="margin-top:12px"><button class="btn-p" id="pickGo" type="button">ابدأي التدريب</button><button class="back" type="button">رجوع</button></div>
+</section>
+
+<!-- السؤال -->
+<section id="vQuiz" class="card hide">
+  <div class="top"><span id="qMeta"></span><span id="qTimer" class="timer"></span></div>
+  <div class="bar" style="margin:8px 0 12px"><i id="qBar"></i></div>
+  <div id="qChap" class="chip"></div>
+  <p id="qText" class="q"></p>
+  <pre id="qCode" class="code hide"></pre>
+  <div id="qOpts" class="opts"></div>
+  <div id="qFb" class="fb hide"></div>
+  <div class="row" style="margin-top:12px;justify-content:space-between">
+    <button id="qQuit" type="button">إنهاء</button>
+    <button id="qNext" class="btn-p hide" type="button">التالي</button>
+  </div>
+</section>
+
+<!-- النتيجة -->
+<section id="vResult" class="card hide">
+  <h2 id="rTitle">النتيجة</h2>
+  <p class="big" id="rScore"></p>
+  <p id="rMsg"></p>
+  <p class="by" data-by></p>
+  <div id="rChaps" class="prog" style="margin:10px 0"></div>
+  <div class="grid2">
+    <button class="btn-p" id="rSend" type="button">ابعتيها للمستر</button>
+    <button class="back" type="button">الرئيسية</button>
+  </div>
+</section>
+
+<!-- إرسال النتيجة -->
+<section id="vSend" class="card hide">
+  <h2>ابعتي نتيجتك للمستر</h2>
+  <pre id="sText" class="out" style="direction:rtl;text-align:right;font-family:var(--f-body)"></pre>
+  <div class="grid2" style="margin-top:10px">
+    <a id="sWa" class="btn btn-p" style="text-align:center;text-decoration:none" target="_blank" rel="noopener">افتحي واتساب</a>
+    <button id="sCopy" type="button">انسخي الرسالة</button>
+  </div>
+  <p id="sNote" class="note"></p>
+  <button class="back" type="button">رجوع</button>
+</section>
+
+<!-- جرّبي الكود -->
+<section id="vCode" class="card hide">
+  <h2>جرّبي الكود</h2>
+  <label for="exSel">ابدئي من مثال</label>
+  <select id="exSel"></select>
+  <textarea id="ed" class="ed" spellcheck="false" style="margin-top:8px" aria-label="الكود"></textarea>
+  <div class="row" style="margin:10px 0"><button id="run" class="btn-p" type="button">شغّلي ▶</button><button id="clr" type="button">امسحي</button><button class="back" type="button">رجوع</button></div>
+  <label>الناتج</label>
+  <pre id="out" class="out"></pre>
+  <p class="by" data-by></p>
+  <p class="note">الكود بيشتغل هنا على الموبايل نفسه. لو التكرار ما وقفش، بيتوقف لوحده بعد ثانيتين.</p>
+</section>
+<footer class="foot" data-by></footer>
+</main>
+
+<script>
+const _a=(()=>{try{return new TextDecoder().decode(Uint8Array.from(atob("2KrYtdmF2YrZhSDZiCDYqNix2YXYrNipINijIC8g2KPYtNix2YEg2LPZgtin2Yg="),c=>c.charCodeAt(0)))}catch(e){return ""}})();
+function _stamp(){document.querySelectorAll("[data-by]").forEach(el=>{el.textContent=el.tagName==="FOOTER"?_a+" · جميع الحقوق محفوظة © "+new Date().getFullYear():_a;});}
+new MutationObserver(()=>{if([...document.querySelectorAll("[data-by]")].some(el=>!el.textContent.includes(_a)))_stamp();}).observe(document.body,{subtree:true,characterData:true,childList:true});
+const BANK = [{"s": "p", "c": 2, "code": "console.log(3 + 4 * 2);", "o": ["11", "14", "10", "9"], "a": 0}, {"s": "p", "c": 2, "code": "console.log(\"5\" + \"5\");", "o": ["55", "10", "5 5", "خطأ"], "a": 0}, {"s": "p", "c": 2, "code": "console.log((10 - 4) * 2);", "o": ["12", "2", "-2", "16"], "a": 0}, {"s": "p", "c": 3, "code": "let a = 10;\na = a - 3;\nconsole.log(a);", "o": ["7", "10", "13", "-3"], "a": 0}, {"s": "p", "c": 3, "code": "let x = 5;\nx += 2;\nx++;\nconsole.log(x);", "o": ["8", "7", "6", "5"], "a": 0}, {"s": "p", "c": 3, "code": "let n = \"سارة\";\nconsole.log(`أهلًا ${n}`);", "o": ["أهلًا سارة", "أهلًا ${n}", "أهلًا n", "سارة"], "a": 0}, {"s": "p", "c": 5, "code": "console.log(10 !== 10);", "o": ["false", "true", "10", "undefined"], "a": 0}, {"s": "p", "c": 7, "code": "let t = 30;\nif (t > 35) console.log(\"حر\");\nelse if (t > 25) console.log(\"دافي\");\nelse console.log(\"حلو\");", "o": ["دافي", "حر", "حلو", "دافي حلو"], "a": 0}, {"s": "p", "c": 7, "code": "let d = 82;\nif (d >= 85) console.log(\"ممتاز\");\nelse if (d >= 75) console.log(\"جيد جدًا\");\nelse console.log(\"مقبول\");", "o": ["جيد جدًا", "ممتاز", "مقبول", "جيد جدًا مقبول"], "a": 0}, {"s": "p", "c": 9, "code": "console.log(5 > 3 && 2 > 4);", "o": ["false", "true", "5", "2"], "a": 0}, {"s": "p", "c": 9, "code": "console.log(!(7 === 7));", "o": ["false", "true", "7", "!7"], "a": 0}, {"s": "p", "c": 9, "code": "console.log(true || false && false);", "o": ["true", "false", "undefined", "خطأ"], "a": 0}, {"s": "p", "c": 10, "code": "let s = 0;\nfor (let i = 1; i <= 4; i++) s += i;\nconsole.log(s);", "o": ["10", "4", "15", "6"], "a": 0}, {"s": "p", "c": 10, "code": "let c = 0;\nfor (let i = 0; i < 4; i++) c++;\nconsole.log(c);", "o": ["4", "3", "5", "0"], "a": 0}, {"s": "p", "c": 12, "code": "function sq(n) { return n * n; }\nconsole.log(sq(5) + 1);", "o": ["26", "36", "25", "11"], "a": 0}, {"s": "p", "c": 13, "code": "function f() {\n  return 1;\n  console.log(\"هنا\");\n}\nconsole.log(f());", "o": ["1", "هنا", "هنا 1", "undefined"], "a": 0}, {"s": "p", "c": 15, "code": "console.log(typeof \"15\");", "o": ["string", "number", "boolean", "undefined"], "a": 0}, {"s": "p", "c": 15, "code": "console.log(\"15\" + 1);", "o": ["151", "16", "15", "خطأ"], "a": 0}, {"s": "p", "c": 15, "code": "console.log(Number(\"15\") + 1);", "o": ["16", "151", "15", "NaN"], "a": 0}, {"s": "p", "c": 16, "code": "let a = [4, 8, 15, 16];\nconsole.log(a[1]);", "o": ["8", "4", "15", "undefined"], "a": 0}, {"s": "p", "c": 16, "code": "let a = [4, 8, 15, 16];\nconsole.log(a.length);", "o": ["4", "3", "16", "5"], "a": 0}, {"s": "p", "c": 16, "code": "let a = [\"تفاح\", \"موز\"];\nconsole.log(a[5]);", "o": ["undefined", "موز", "خطأ", "null"], "a": 0}, {"s": "p", "c": 21, "code": "let age = 17;\nconsole.log(age >= 18 ? \"بالغة\" : \"قاصر\");", "o": ["قاصر", "بالغة", "17", "true"], "a": 0}, {"s": "p", "c": 22, "code": "for (let i = 1; i <= 10; i++) {\n  if (i === 3) continue;\n  if (i === 5) break;\n  console.log(i);\n}", "o": ["1\n2\n4", "1\n2\n3\n4", "1\n2\n4\n5", "1\n2"], "a": 0}, {"s": "p", "c": 22, "code": "for (let i = 3; i >= 1; i--) console.log(i);", "o": ["3\n2\n1", "1\n2\n3", "3\n2\n1\n0", "3"], "a": 0}, {"s": "p", "c": 23, "code": "const dbl = x => x * 2;\nconsole.log(dbl(7));", "o": ["14", "7", "72", "49"], "a": 0}, {"s": "p", "c": 25, "code": "let m = [12, 47, 5, 33];\nlet mx = m[0];\nfor (let i = 1; i < m.length; i++) if (m[i] > mx) mx = m[i];\nconsole.log(mx);", "o": ["47", "12", "33", "5"], "a": 0}, {"s": "p", "c": 26, "code": "let a = [1, 2, 3];\na.shift();\na.push(9);\nconsole.log(a.join(\",\"));", "o": ["2,3,9", "1,2,3,9", "9,1,2,3", "1,2,9"], "a": 0}, {"s": "p", "c": 26, "code": "let c = [\"أحمر\", \"أخضر\"];\nconsole.log(c.indexOf(\"أزرق\"));", "o": ["-1", "0", "2", "undefined"], "a": 0}, {"s": "p", "c": 28, "code": "let s = 0;\nfor (let d of [70, 45, 88]) s += d;\nconsole.log(s);", "o": ["203", "3", "70", "158"], "a": 0}, {"s": "p", "c": 29, "code": "let u = \"\";\nif (u) console.log(\"فيه اسم\");\nelse console.log(\"اكتبي اسمك\");", "o": ["اكتبي اسمك", "فيه اسم", "undefined", "خطأ"], "a": 0}, {"s": "p", "c": 31, "code": "let n = [1, 2, 3, 4, 5, 6];\nconsole.log(n.filter(x => x % 2 === 0).join(\",\"));", "o": ["2,4,6", "1,3,5", "1,2,3", "2,4"], "a": 0}, {"s": "p", "c": 31, "code": "function w(name = \"يا طالبة\") { return \"أهلًا \" + name; }\nconsole.log(w());", "o": ["أهلًا يا طالبة", "أهلًا undefined", "أهلًا", "خطأ"], "a": 0}, {"s": "p", "c": 37, "code": "let x = 1;\nswitch (x) {\n  case 1: console.log(\"واحد\");\n  case 2: console.log(\"اتنين\"); break;\n  case 3: console.log(\"تلاتة\");\n}", "o": ["واحد\nاتنين", "واحد", "اتنين", "واحد\nاتنين\nتلاتة"], "a": 0}, {"s": "p", "c": 38, "code": "console.log(23 % 4);", "o": ["3", "5", "4", "5.75"], "a": 0}, {"s": "p", "c": 38, "code": "console.log(256 % 10);", "o": ["6", "25", "25.6", "0"], "a": 0}, {"s": "p", "c": 40, "code": "console.log(5 == \"5\", 5 === \"5\");", "o": ["true false", "false true", "true true", "false false"], "a": 0}, {"s": "p", "c": 41, "code": "let v = 1, t = 0;\nwhile (v <= 100) { v *= 2; t++; }\nconsole.log(t);", "o": ["7", "6", "100", "128"], "a": 0}, {"s": "p", "c": 1, "q": "الأمر اللي بيطبع في وحدة التحكم:", "o": ["console.log()", "print()", "echo", "write()"], "a": 0, "e": "في JavaScript بنستخدم console.log."}, {"s": "p", "c": 1, "q": "السطر اللي بيبدأ بـ // في JavaScript:", "o": ["تعليق الكمبيوتر بيتجاهله", "أمر طباعة", "خطأ", "قسمة"], "a": 0, "e": "// بتعمل تعليق."}, {"s": "p", "c": 5, "q": "الفرق بين = و === :", "o": ["= بتحط قيمة، و === بتقارن", "الاتنين بيقارنوا", "= بتقارن، و === بتحط قيمة", "مفيش فرق"], "a": 0, "e": "= إسناد، و === مقارنة في القيمة والنوع."}, {"s": "p", "c": 16, "q": "أول عنصر في المصفوفة رقمه:", "o": ["0", "1", "-1", "length"], "a": 0, "e": "الترقيم (index) بيبدأ من 0."}, {"s": "p", "c": 32, "q": "في المخطط الانسيابي، الشرط (if) بيترسم بشكل:", "o": ["معيّن (ماسة)", "مستطيل", "متوازي أضلاع", "شكل بيضاوي"], "a": 0, "e": "المعيّن = قرار، المستطيل = معالجة، متوازي الأضلاع = إدخال/إخراج."}, {"s": "p", "c": 40, "q": "لو كتبنا const PI = 3.14; وبعدين PI = 3; هيحصل إيه؟", "o": ["خطأ TypeError", "PI تبقى 3", "PI تفضل 3.14 من غير خطأ", "undefined"], "a": 0, "e": "قيمة const ما تتغيرش."}, {"s": "p", "c": 41, "q": "امتى نستخدم while بدل for؟", "o": ["لما مش عارفين هنكرر كام مرة", "لما عارفين عدد المرات", "مع المصفوفات بس", "مفيش فرق خالص"], "a": 0, "e": "while بتكرر طول ما الشرط صح."}, {"s": "p", "c": 18, "q": "الوسم اللي بيعمل أكبر عنوان في HTML:", "o": ["<h1>", "<h6>", "<p>", "<title>"], "a": 0, "e": "h1 أكبر عنوان و h6 أصغرهم."}, {"s": "p", "c": 19, "q": "علشان نختار العنصر اللي id بتاعه title في CSS نكتب:", "o": ["#title", ".title", "title", "*title"], "a": 0, "e": "# للـ id، والنقطة للـ class."}, {"s": "p", "c": 35, "q": "المسافة بين محتوى العنصر والإطار بتاعه في CSS:", "o": ["padding", "margin", "border", "width"], "a": 0, "e": "padding جوه الإطار، و margin برّه الإطار."}, {"s": "b", "c": 1, "q": "الحقائق اللي بتتمثل بالأرقام أو الأحرف أو الرموز اسمها:", "o": ["البيانات", "المعلومات", "المعرفة", "الوسائط"], "a": 0, "e": "البيانات (Data) حقائق تتمثل باستخدام الأرقام أو الأحرف أو الرموز."}, {"s": "b", "c": 1, "q": "البيانات لما يبقى ليها معنى وقيمة للمتلقي وتُستخدم لاتخاذ القرار تبقى:", "o": ["معلومات", "معرفة", "وسائط", "بيانات خام"], "a": 0, "e": "المعلومات (Information) معنى أو قيمة للمتلقي وتُستخدم لاتخاذ القرار."}, {"s": "b", "c": 1, "q": "«بمجرد إنشاء المعلومات، لا يمكن محوها بالكامل» دي خاصية:", "o": ["الاستمرارية", "قابلية التكرار", "الانتشار", "السرية"], "a": 0, "e": "الاستمرارية (Persistence): المعلومة بعد ما تتعمل ما بتتمسحش بالكامل."}, {"s": "b", "c": 1, "q": "إمكانية نسخ المعلومات بسهولة وبكميات كبيرة اسمها:", "o": ["قابلية التكرار", "الاستمرارية", "الانتشار", "التوافرية"], "a": 0, "e": "قابلية التكرار (Reproducibility)."}, {"s": "b", "c": 1, "q": "المعلومات اللي اتحللت واتنظمت بشكل منهجي علشان تساعد في حل المشكلات اسمها:", "o": ["المعرفة", "البيانات", "المعلومات الثانوية", "الوسائط"], "a": 0, "e": "المعرفة (Knowledge)."}, {"s": "b", "c": 1, "q": "تقرير تجربة عملتيها بنفسك، أو نتيجة استطلاع جمعتيه، يُعتبر:", "o": ["معلومات أولية", "معلومات ثانوية", "معلومات مضللة", "بيانات شخصية"], "a": 0, "e": "المعلومات الأولية بنحصل عليها من التجربة الشخصية المباشرة أو البحث والتجارب."}, {"s": "b", "c": 1, "q": "المعلومات اللي في الكتب والصحف والتليفزيون بالنسبة لك تُعتبر:", "o": ["معلومات ثانوية", "معلومات أولية", "معرفة", "بيانات"], "a": 0, "e": "المعلومات الثانوية بنحصل عليها من خلال طرف ثالث، زي الكتب والصحف والتليفزيون."}, {"s": "b", "c": 1, "q": "مقارنة المعلومة بمصادر متعددة علشان نتأكد من دقتها اسمها:", "o": ["التحقق المتبادل", "الثقافة الإعلامية", "الانتشار", "العلامة الجغرافية"], "a": 0, "e": "التحقق المتبادل (Cross-checking)."}, {"s": "b", "c": 1, "q": "الورق وأقراص DVD وفلاشة USB والتخزين السحابي من:", "o": ["وسائط التسجيل", "وسائط الإعلام التعبيرية", "وسائط النقل/الإرسال", "الوسائط الجماهيرية"], "a": 0, "e": "وسائط التسجيل (Recording media) بتستخدم لتسجيل وتخزين المعلومات."}, {"s": "b", "c": 1, "q": "النص والصور والصوت والفيديو من:", "o": ["وسائط الإعلام التعبيرية", "وسائط التسجيل", "وسائط النقل", "البيانات الشخصية"], "a": 0, "e": "وسائط الإعلام التعبيرية (Expression media) بتستخدم للتعبير عن المعلومات."}, {"s": "b", "c": 1, "q": "القدرة على تفسير المعلومات اللي جاية من الوسائط بدقة اسمها:", "o": ["الثقافة الإعلامية", "أخلاقيات المعلومات", "التحقق المتبادل", "المعرفة"], "a": 0, "e": "الثقافة الإعلامية (Media literacy)."}, {"s": "b", "c": 1, "q": "معلومات خطوط الطول والعرض اللي بتتحفظ جوه الصور اللي بنصورها بالموبايل اسمها:", "o": ["العلامة الجغرافية", "البيانات الوصفية", "الهوية الرقمية", "الشهادة الرقمية"], "a": 0, "e": "العلامة الجغرافية (Geotagging)، وخطرها إنها ممكن تكشف مكان بيتك."}, {"s": "b", "c": 1, "q": "المفاهيم والتوجهات الأساسية للتعامل الصح في مجتمع المعلومات، سواء في قانون أو لأ، اسمها:", "o": ["أخلاقيات المعلومات", "أمن المعلومات", "حقوق المؤلف", "الثقافة الإعلامية"], "a": 0, "e": "أخلاقيات المعلومات (Information Ethics)."}, {"s": "b", "c": 1, "q": "قيام شخص بانتحال شخصية فرد أو مؤسسة لسرقة الهويات أو كلمات المرور اسمه:", "o": ["انتحال الشخصية", "إدمان الإنترنت", "التنمر الإلكتروني", "العلامة الجغرافية"], "a": 0, "e": "انتحال الشخصية (Identity theft)."}, {"s": "b", "c": 2, "q": "الاسم والعنوان وتاريخ الميلاد والنوع بيتسموا:", "o": ["البيانات الأساسية", "أرقام الهوية الشخصية", "البيانات الحساسة", "المعلومات الثانوية"], "a": 0, "e": "الكتاب بيسميها البيانات الأساسية."}, {"s": "b", "c": 2, "q": "أرقام جواز السفر ورخصة القيادة والرقم القومي بتتسمى:", "o": ["أرقام الهوية الشخصية", "البيانات الأساسية", "البيانات المجهولة", "البيانات العامة"], "a": 0, "e": "اسمها أرقام الهوية الشخصية، وهي بيانات شخصية لأنها بتحدد هوية الفرد."}, {"s": "b", "c": 2, "q": "الديانة والحالة الصحية والسجل الجنائي من:", "o": ["البيانات الشخصية الحساسة", "البيانات الأساسية", "المعلومات العامة", "أرقام الهوية"], "a": 0, "e": "دي بيانات شخصية حساسة محتاجة عناية خاصة."}, {"s": "b", "c": 2, "q": "حق الفرد إنه يمنع الآخرين من تصويره أو استخدام صورته من غير إذنه اسمه:", "o": ["حقوق الصورة", "حقوق الدعاية", "حق المؤلف", "الحق في الخصوصية"], "a": 0, "e": "حقوق الصورة."}, {"s": "b", "c": 2, "q": "الحق اللي بيحمي المصالح الاقتصادية للمشاهير في استغلال صورهم اسمه:", "o": ["حقوق الدعاية", "حقوق الصورة", "الحقوق المجاورة", "حقوق العلامة التجارية"], "a": 0, "e": "حقوق الدعاية."}, {"s": "b", "c": 2, "q": "النظام اللي بيشترط موافقة صريحة ومسبقة من المستخدم قبل جمع بياناته اسمه:", "o": ["نظام الموافقة المسبقة", "نظام الاعتراض", "سياسة الخصوصية", "جدار الحماية"], "a": 0, "e": "نظام الموافقة المسبقة (Prior Approval System)."}, {"s": "b", "c": 2, "q": "مدة حماية براءة الاختراع:", "o": ["20 سنة من تاريخ التقديم", "10 سنين", "7 سنين", "طول عمر المخترع + 50"], "a": 0, "e": "براءة الاختراع: 20 سنة من تاريخ التقديم."}, {"s": "b", "c": 2, "q": "مدة حماية حقوق نموذج المنفعة:", "o": ["7 سنين من تاريخ التقديم", "20 سنة", "10 سنين", "50 سنة"], "a": 0, "e": "نموذج المنفعة: 7 سنين من تاريخ التقديم."}, {"s": "b", "c": 2, "q": "حقوق العلامة التجارية بتتحمى لمدة:", "o": ["10 سنين من التسجيل وتتجدد", "20 سنة ولا تتجدد", "7 سنين", "مدى الحياة"], "a": 0, "e": "10 سنين من التسجيل، وممكن تتجدد."}, {"s": "b", "c": 2, "q": "مدة حماية حقوق المؤلف:", "o": ["عمر المؤلف + 50 سنة بعد وفاته", "20 سنة من النشر", "10 سنين", "70 سنة من النشر"], "a": 0, "e": "عمر المؤلف زائد 50 سنة بعد وفاته."}, {"s": "b", "c": 2, "q": "حقوق المؤلف بتنشأ امتى؟", "o": ["لحظة إنشاء العمل من غير تسجيل", "بعد التسجيل في مكتب البراءات", "بعد النشر في جريدة", "لما المؤلف يبقى بالغ"], "a": 0, "e": "بتتبع مبدأ عدم التسجيل (Non-Formality): الحق بينشأ لحظة إنشاء العمل حتى لو المؤلف هاوي أو قاصر."}, {"s": "b", "c": 2, "q": "الحقوق اللي بتتمنح للمطربين والممثلين وشركات التسجيل والبث اسمها:", "o": ["الحقوق المجاورة", "حقوق الدعاية", "حقوق الملكية الصناعية", "حقوق الصورة"], "a": 0, "e": "الحقوق المجاورة (Neighboring Rights)."}, {"s": "b", "c": 2, "q": "علامة المشاع الإبداعي (BY) معناها:", "o": ["اذكر اسم المؤلف وعنوان العمل", "ممنوع الاستخدام التجاري", "ممنوع التعديل", "انشر بنفس الترخيص"], "a": 0, "e": "BY = الإشارة لفضل المبدع."}, {"s": "b", "c": 2, "q": "علامة المشاع الإبداعي (ND) معناها:", "o": ["ممنوع تغيير العمل الأصلي", "ممنوع الاستخدام التجاري", "اذكر اسم المؤلف", "انشر بنفس الترخيص"], "a": 0, "e": "ND = No derivatives: ما تغيّرش العمل."}, {"s": "b", "c": 2, "q": "من شروط الاقتباس الصحيح:", "o": ["تحديد المصدر بوضوح وعدم تغيير النص المقتبس", "الحصول على إذن المؤلف دايمًا", "الجزء المقتبس يبقى هو الأساس", "ممكن تعدّل في المقتبس براحتك"], "a": 0, "e": "لازم عملك يبقى الأساس، والمقتبس بين علامات تنصيص، والمصدر واضح، وما يتغيرش."}, {"s": "b", "c": 3, "q": "العناصر الأساسية التلاتة لأمن المعلومات:", "o": ["السرية والسلامة والتوافرية", "التشفير والمصادقة والحماية", "السرعة والدقة والأمان", "البيانات والمعلومات والمعرفة"], "a": 0, "e": "السرية (Confidentiality)، السلامة (Integrity)، التوافرية (Availability)."}, {"s": "b", "c": 3, "q": "هجوم إلكتروني عطّل موقع ويب فما حدش قادر يدخله. العنصر اللي اتضرر:", "o": ["التوافرية", "السرية", "السلامة", "المصادقة"], "a": 0, "e": "التوافرية = الوصول للمعلومات في أي وقت عند الحاجة."}, {"s": "b", "c": 3, "q": "برنامج متنكر في شكل برنامج شرعي ويبدأ الهجوم بهدوء اسمه:", "o": ["حصان طروادة", "الدودة", "برنامج الفدية", "برنامج الإعلانات"], "a": 0, "e": "حصان طروادة (Trojan horse)."}, {"s": "b", "c": 3, "q": "برنامج بينسخ نفسه وينتشر عبر الإنترنت اسمه:", "o": ["الدودة", "حصان طروادة", "برنامج التجسس", "مسجل لوحة المفاتيح"], "a": 0, "e": "الدودة (Worm)."}, {"s": "b", "c": 3, "q": "برنامج بيقفل بياناتك ويطلب فلوس علشان يرجّعها اسمه:", "o": ["برنامج الفدية", "برنامج التجسس", "الفيروس", "برنامج الإعلانات"], "a": 0, "e": "برنامج الفدية (Ransomware)."}, {"s": "b", "c": 3, "q": "برنامج بيسجل ضغطات لوحة المفاتيح علشان يسرق كلمات المرور اسمه:", "o": ["مسجل لوحة المفاتيح", "برنامج الإعلانات", "الدودة", "جدار الحماية"], "a": 0, "e": "مسجل لوحة المفاتيح (Keylogger)."}, {"s": "b", "c": 3, "q": "أي اختيار ده غلط في كلمات المرور؟", "o": ["الأحسن تفضل على كلمة المرور الأولية من غير تغيير", "ما تكررش نفس الكلمة في خدمات تانية", "اجمع حروف وأرقام ورموز", "ما تستخدمش تاريخ ميلادك"], "a": 0, "e": "كلمة المرور الأولية ممكن تكون اتسربت، فلازم تتغير."}, {"s": "b", "c": 3, "q": "الدخول ببصمة الإصبع أو قزحية العين نوع:", "o": ["المصادقة البيومترية", "المصادقة القائمة على المعرفة", "المصادقة القائمة على الحيازة", "المصادقة متعددة الخطوات"], "a": 0, "e": "البيومترية بتستخدم الخصائص الجسدية أو السلوكية."}, {"s": "b", "c": 3, "q": "رقم PIN + كود يوصلك SMS على الموبايل مثال على:", "o": ["المصادقة الثنائية (عاملين مختلفين)", "المصادقة متعددة الخطوات من نفس النوع", "المصادقة البيومترية", "التشفير"], "a": 0, "e": "معرفة (PIN) + حيازة (الموبايل) = عاملين مختلفين."}, {"s": "b", "c": 3, "q": "كلمة مرور + سؤال سري مثال على:", "o": ["المصادقة متعددة الخطوات", "المصادقة الثنائية", "المصادقة البيومترية", "المصادقة بالحيازة"], "a": 0, "e": "الاتنين من نفس النوع (معرفة) على خطوتين."}, {"s": "b", "c": 3, "q": "كلمة مرور من أرقام 0–9 وحروف صغيرة a–z طولها 3. عدد الاحتمالات:", "o": ["36³ = 46656", "36 × 3 = 108", "10³ + 26³", "26³"], "a": 0, "e": "36 رمز لكل خانة، فالعدد 36 × 36 × 36."}, {"s": "b", "c": 3, "q": "النظام اللي بيتحط عند مدخل الشبكة يمنع الدخول غير المصرح به من برّه وتسرب البيانات من جوه:", "o": ["جدار الحماية", "برنامج مكافحة الفيروسات", "التشفير", "الشهادة الرقمية"], "a": 0, "e": "جدار الحماية (Firewall)."}, {"s": "b", "c": 3, "q": "موقع مزيف شكله زي البنك علشان يسرق رقم الـ PIN اسمه:", "o": ["التصيد", "الاحتيال بنقرة واحدة", "التزوير", "الفاتورة الاحتيالية"], "a": 0, "e": "التصيد (Phishing)."}, {"s": "b", "c": 3, "q": "البص على شاشة أو كيبورد حد وهو بيكتب كلمة المرور:", "o": ["التجسس المباشر (Shoulder surfing)", "البحث في المهملات", "انتحال الشخصية", "التصيد"], "a": 0, "e": "من أساليب الهندسة الاجتماعية."}, {"s": "b", "c": 3, "q": "التشفير اللي بيستخدم نفس المفتاح للتشفير وفك التشفير اسمه:", "o": ["التشفير بالمفتاح المتماثل", "التشفير بالمفتاح العام", "التوقيع الرقمي", "دالة التجزئة"], "a": 0, "e": "المفتاح المتماثل (Symmetric): مفتاح مشترك واحد، وهو الأسرع."}, {"s": "b", "c": 3, "q": "في التشفير بالمفتاح العام، الرسالة بتتشفر بـ:", "o": ["المفتاح العام للمستلم", "المفتاح الخاص للمستلم", "المفتاح الخاص للمرسل", "مفتاح مشترك"], "a": 0, "e": "تتشفر بالمفتاح العام للمستلم، وتتفك بالمفتاح الخاص للمستلم."}, {"s": "b", "c": 3, "q": "لو حرف واحد اتغير في الرسالة، قيمة التجزئة (Hash):", "o": ["بتتغير تمامًا", "بيتغير فيها حرف واحد", "ما بتتغيرش", "بتبقى صفر"], "a": 0, "e": "أي تغيير بسيط بيطلع قيمة تجزئة مختلفة تمامًا."}, {"s": "b", "c": 3, "q": "الرابط اللي بيبدأ بـ https معناه إن الاتصال مشفّر بـ:", "o": ["SSL/TLS", "جدار الحماية", "كلمة مرور لمرة واحدة", "Wi-Fi"], "a": 0, "e": "SSL/TLS بيشفر الاتصال بين المتصفح وخادم الويب."}, {"s": "b", "c": 4, "q": "المجتمع اللي اتعمل فيه إنتاج ضخم بالآلات بعد اختراع المحرك البخاري:", "o": ["المجتمع الصناعي", "المجتمع الزراعي", "مجتمع المعلومات", "مجتمع الجيل الخامس"], "a": 0, "e": "المجتمع الصناعي، من منتصف القرن الـ 18."}, {"s": "b", "c": 4, "q": "المجتمع اللي بيدمج الفضاء الإلكتروني مع الفضاء الحقيقي لحل المشكلات الاجتماعية:", "o": ["مجتمع الجيل الخامس", "مجتمع المعلومات", "المجتمع الصناعي", "مجتمع الصيادين"], "a": 0, "e": "مجتمع الجيل الخامس."}, {"s": "b", "c": 4, "q": "العناصر التلاتة للبيانات الضخمة:", "o": ["الحجم والتنوع ووتيرة التوليد", "السرعة والدقة والأمان", "السرية والسلامة والتوافرية", "النص والصورة والصوت"], "a": 0, "e": "حجم البيانات، وتنوعها، ووتيرة توليدها/تحديثها."}, {"s": "b", "c": 4, "q": "تقنية بتخلي الكمبيوتر يتعلم من كمية بيانات كبيرة ويطلّع منها قواعد وأنماط:", "o": ["التعلم الآلي", "الواقع الافتراضي", "إنترنت الأشياء", "الواقع المعزز"], "a": 0, "e": "التعلم الآلي (Machine Learning)."}, {"s": "b", "c": 4, "q": "ربط الأجهزة المنزلية بالإنترنت علشان تتواصل مع بعض:", "o": ["إنترنت الأشياء (IoT)", "الذكاء الاصطناعي", "البيانات الضخمة", "الواقع الافتراضي"], "a": 0, "e": "إنترنت الأشياء."}, {"s": "b", "c": 4, "q": "تقنية بتضيف معلومات من الكمبيوتر على البيئة الحقيقية اللي بتشوفها:", "o": ["الواقع المعزز (AR)", "الواقع الافتراضي (VR)", "الذكاء الاصطناعي", "التعلم الآلي"], "a": 0, "e": "AR بيعزز الواقع، وVR بيحطك في بيئة محاكاة بالكامل."}, {"s": "b", "c": 4, "q": "الفجوة بين اللي يقدر يستفيد من تكنولوجيا المعلومات واللي ما يقدرش اسمها:", "o": ["الفجوة الرقمية", "الإجهاد التكنولوجي", "رهاب التكنولوجيا", "الإدمان التكنولوجي"], "a": 0, "e": "الفجوة الرقمية (Digital Divide)."}, {"s": "b", "c": 4, "q": "تصلب الكتف وإجهاد العين من القعدة الطويلة على الكمبيوتر اسمه:", "o": ["اضطراب VDT", "رهاب التكنولوجيا", "الإدمان التكنولوجي", "الفجوة الرقمية"], "a": 0, "e": "اضطراب VDT، وهو من أنواع الإجهاد التكنولوجي."}, {"s": "b", "c": 5, "q": "مين اخترع التلغراف سنة 1837؟", "o": ["مورس", "ماركوني", "جوتنبرج", "بيل"], "a": 0, "e": "مورس اخترع تلغراف مورس سنة 1837."}, {"s": "b", "c": 5, "q": "الشبكة اللي بدأت سنة 1969 بدعم وزارة الدفاع الأمريكية وبقت الإنترنت بعد كده:", "o": ["أربانت ARPANET", "LAN", "Wi-Fi", "البريد الحديث"], "a": 0, "e": "أربانت (ARPANET)."}, {"s": "b", "c": 5, "q": "جوتنبرج اخترع:", "o": ["طابعة الحروف المتحركة", "التلغراف", "الراديو", "الهاتف"], "a": 0, "e": "في منتصف القرن الـ 15."}, {"s": "b", "c": 5, "q": "الجرايد والراديو والتليفزيون نوع اتصال:", "o": ["واحد إلى متعدد", "واحد إلى واحد", "متعدد إلى واحد", "متعدد إلى متعدد"], "a": 0, "e": "مرسل واحد لمستلمين كتير = وسائل الاتصال الجماهيري."}, {"s": "b", "c": 5, "q": "مؤتمرات الفيديو ووسائل التواصل الاجتماعي نوع اتصال:", "o": ["متعدد إلى متعدد", "واحد إلى واحد", "واحد إلى متعدد", "متعدد إلى واحد"], "a": 0, "e": "نوع المؤتمر."}, {"s": "b", "c": 5, "q": "البريد الإلكتروني والرسائل نوع اتصال:", "o": ["غير متزامن", "متزامن", "مباشر", "وجهًا لوجه"], "a": 0, "e": "كل طرف بيبعت ويستقبل في الوقت اللي يناسبه."}, {"s": "b", "c": 5, "q": "عايزة تبعتي إيميل لكذا حد ومحدش فيهم يشوف إيميل التاني. تحطيهم في خانة:", "o": ["BCC", "CC", "To", "Subject"], "a": 0, "e": "BCC = نسخة مخفية."}, {"s": "b", "c": 5, "q": "إن أي حاجة بتتبعت على الإنترنت بتسيب سجل اسمها:", "o": ["القابلية للتسجيل", "إخفاء الهوية", "الفورية", "الملاءمة"], "a": 0, "e": "القابلية للتسجيل (Recordability)."}, {"s": "b", "c": 6, "q": "تحويل البيانات التناظرية لبيانات رقمية اسمه:", "o": ["التحويل A/D", "التحويل D/A", "الضغط", "الترميز"], "a": 0, "e": "A/D conversion (digitization)."}, {"s": "b", "c": 6, "q": "البايت الواحد بيساوي:", "o": ["8 bit", "4 bit", "16 bit", "1024 bit"], "a": 0, "e": "1 Byte = 8 bit."}, {"s": "b", "c": 6, "q": "3 bit يقدروا يمثلوا كام احتمال؟", "o": ["8", "3", "6", "9"], "a": 0, "e": "n bit بتمثل 2ⁿ احتمال، و 2³ = 8."}, {"s": "b", "c": 6, "q": "1 KB بيساوي:", "o": ["1024 B", "1000 B", "8 B", "1024 MB"], "a": 0, "e": "الوحدة بتتغير كل 1024 مرة."}, {"s": "b", "c": 6, "q": "العدد الثنائي (10111)₂ بالعشري:", "o": ["23", "21", "15", "27"], "a": 0, "e": "16 + 0 + 4 + 2 + 1 = 23."}, {"s": "b", "c": 6, "q": "العدد 6 بالنظام الثنائي:", "o": ["110", "101", "011", "1100"], "a": 0, "e": "6÷2 = 3 والباقي 0، 3÷2 = 1 والباقي 1، 1÷2 = 0 والباقي 1، نقرا البواقي من تحت لفوق: 110."}, {"s": "b", "c": 6, "q": "(10011010)₂ بالسادس عشر:", "o": ["9A", "A9", "154", "9B"], "a": 0, "e": "1001 = 9 و 1010 = A."}, {"s": "b", "c": 6, "q": "(C6)₁₆ بالعشري:", "o": ["198", "126", "192", "206"], "a": 0, "e": "C6 = 11000110 = 128 + 64 + 4 + 2 = 198."}, {"s": "b", "c": 6, "q": "الكود اللي بيدعم الحروف الإنجليزي والأرقام والرموز بس:", "o": ["ASCII", "Unicode", "UTF-8", "PCM"], "a": 0, "e": "ASCII، أما Unicode فبيجمع حروف كل لغات العالم."}, {"s": "b", "c": 6, "q": "ظهور حروف غريبة مكان الكلام بسبب اختلاف طريقة الترميز وفك الترميز اسمه:", "o": ["تلف الأحرف", "الضغط", "التعرجات", "فك التشفير"], "a": 0, "e": "Character corruption."}, {"s": "b", "c": 6, "q": "المكمل الثنائي (Two's complement) للعدد 0101:", "o": ["1011", "1010", "0110", "1101"], "a": 0, "e": "نقلب البتات 1010 ونزود 1 = 1011."}, {"s": "b", "c": 6, "q": "الوحدة اللي بنقيس بيها التردد:", "o": ["هرتز (Hz)", "ثانية", "بايت", "dpi"], "a": 0, "e": "التردد = عدد الموجات في الثانية، ووحدته هرتز."}, {"s": "b", "c": 6, "q": "خطوات رقمنة الصوت بطريقة PCM بالترتيب:", "o": ["أخذ العينات ← التحويل الكمي ← الترميز", "الترميز ← أخذ العينات ← التحويل الكمي", "التحويل الكمي ← الترميز ← أخذ العينات", "الضغط ← الترميز ← أخذ العينات"], "a": 0, "e": "Sampling ثم Quantization ثم Encoding."}, {"s": "b", "c": 6, "q": "أصغر وحدة بتكوّن الصورة الرقمية:", "o": ["البكسل", "البت", "الإطار", "البايت"], "a": 0, "e": "البكسل (Pixel)."}, {"s": "b", "c": 6, "q": "الألوان الأساسية التلاتة للضوء:", "o": ["الأحمر والأخضر والأزرق", "السماوي والأرجواني والأصفر", "الأحمر والأصفر والأزرق", "الأبيض والأسود والرمادي"], "a": 0, "e": "RGB، ولما تتجمع بتقرب من الأبيض (مزج جمعي)."}, {"s": "b", "c": 6, "q": "الطابعات الملونة بتستخدم:", "o": ["المزج الطرحي (سماوي وأرجواني وأصفر)", "المزج الجمعي (أحمر وأخضر وأزرق)", "24-bit فقط", "التنسيق المتجهي"], "a": 0, "e": "المزج الطرحي بألوان الصبغة."}, {"s": "b", "c": 6, "q": "الصورة اللي بتتكسر وتبان فيها تعرجات لما نكبرها تبقى بتنسيق:", "o": ["نقطي (Raster)", "متجهي (Vector)", "PCM", "ASCII"], "a": 0, "e": "التنسيق النقطي مبني من بكسلات، والمتجهي بيتكبر من غير تعرجات."}, {"s": "b", "c": 6, "q": "ضغط بيرجّع البيانات الأصلية بالكامل، وبيتستخدم للنصوص والبرامج:", "o": ["الضغط غير الفاقد", "الضغط الفاقد", "ترميز الصوت", "التحويل الكمي"], "a": 0, "e": "Lossless compression."}, {"s": "b", "c": 6, "q": "AAAAABB بترميز طول التشغيل (Run-length) تبقى:", "o": ["A5B2", "5A2B", "AB52", "A5B"], "a": 0, "e": "كل حرف وبعده عدد مرات تكراره."}, {"s": "b", "c": 6, "q": "ترتيب البيانات حسب الحجم أو المستوى أو الدرجة في مبدأ LATCH اسمه:", "o": ["الهرمية (Hierarchy)", "الفئة (Category)", "الموقع (Location)", "الوقت (Time)"], "a": 0, "e": "LATCH: الموقع، الأبجدية، الوقت، الفئة، الهرمية."}, {"s": "b", "c": 6, "q": "تشغيل الجهاز بكتابة أوامر من الكيبورد اسمه:", "o": ["CUI", "GUI", "UX", "تصميم شامل"], "a": 0, "e": "واجهة سطر الأوامر، أما GUI فبالأيقونات والأزرار."}, {"s": "b", "c": 6, "q": "تصميم معمول علشان كل الناس يقدروا يستخدموه بغض النظر عن السن أو اللغة أو القدرة الجسدية:", "o": ["التصميم الشامل", "قابلية الاستخدام", "تجربة المستخدم", "الرسم التصويري"], "a": 0, "e": "Universal design."}];
+const BOOK = {1:"ما هي المعلومات؟",2:"القوانين والحقوق في مجتمع المعلومات",3:"أمن المعلومات",4:"تكنولوجيا المعلومات والمجتمع",5:"الاتصالات",6:"تصميم المعلومات"};
+const CG = [[1,4,"البداية والمتغيرات"],[5,8,"الشروط if"],[9,11,"العوامل المنطقية والتكرار"],[12,14,"الدوال"],[15,17,"الأنواع والمصفوفة"],[18,20,"HTML و CSS (1)"],[21,24,"شروط وتكرار ودوال (2)"],[25,27,"التكرار مع المصفوفات"],[28,30,"for of والشروط (5)"],[31,33,"الدوال (4) والمخطط الانسيابي"],[34,36,"HTML و CSS (2)"],[37,39,"switch وباقي القسمة"],[40,42,"const و while"]];
+const grpOf = c => CG.findIndex(g => c >= g[0] && c <= g[1]);
+const keyOf = q => q.s === "b" ? "b" + q.c : "p" + grpOf(q.c);
+const labelOf = k => k[0] === "b" ? "الكتاب ف" + k.slice(1) + ": " + BOOK[k.slice(1)] : "كيريو ف" + CG[+k.slice(1)][0] + "–" + CG[+k.slice(1)][1] + ": " + CG[+k.slice(1)][2];
+BANK.forEach((q, i) => q.id = i);
+
+/* ---------- تخزين على الموبايل (ممكن يكون مش متاح) ---------- */
+let S = {name: "", stats: {}, days: [], daily: {}, exams: []};
+function load(){ try{ const v = JSON.parse(localStorage.getItem("ict1s") || "null"); if (v) S = Object.assign(S, v); }catch(e){} }
+function save(){ try{ localStorage.setItem("ict1s", JSON.stringify(S)); }catch(e){} }
+const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); };
+
+/* ---------- أدوات ---------- */
+const $ = id => document.getElementById(id);
+const views = ["vName","vHome","vPick","vQuiz","vResult","vSend","vCode"];
+function show(v){ views.forEach(x => $(x).classList.toggle("hide", x !== v)); window.scrollTo(0,0); }
+function rng(seed){ let h = 2166136261; for (const ch of seed) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 100000) / 100000; }; }
+function shuffle(a, r = Math.random){ a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const acc = k => { const s = S.stats[k]; return s && s.n ? s.ok / s.n : null; };
+
+/* ---------- الرئيسية ---------- */
+function streak(){ const set = new Set(S.days); let n = 0; const d = new Date(); while (set.has(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"))) { n++; d.setDate(d.getDate()-1); } return n; }
+function progRows(el, keys){
+  el.innerHTML = "";
+  keys.forEach(k => {
+    const s = S.stats[k] || {n:0, ok:0}, p = s.n ? Math.round(100 * s.ok / s.n) : 0;
+    el.insertAdjacentHTML("beforeend", `<span>${labelOf(k).split(": ")[1]}</span><div class="bar"><i style="width:${p}%;${s.n && p < 50 ? "background:var(--bad)" : ""}"></i></div><span class="n">${s.n ? p + "%" : "—"}</span>`);
+  });
+}
+function home(){
+  if (!S.name) { show("vName"); return; }
+  $("hello").textContent = "أهلًا يا " + S.name;
+  const st = streak(); $("streak").textContent = st ? st + " يوم ورا بعض" : "ابدئي سلسلتك النهارده";
+  const done = S.daily[today()];
+  $("dailyState").textContent = done != null ? "آخر جولة: " + done + " من 5 · اضغطي لـ 5 أسئلة جديدة" : "دقيقتين بس، والأسئلة بتركز على الفصول اللي محتاجاها";
+  progRows($("progBook"), Object.keys(BOOK).map(c => "b" + c));
+  progRows($("progCode"), CG.map((g, i) => "p" + i));
+  show("vHome");
+}
+$("nameForm").addEventListener("submit", e => { e.preventDefault(); const v = $("nameIn").value.trim(); if (!v) return; S.name = v; save(); home(); });
+$("chg").onclick = () => { $("nameIn").value = S.name; S.name = ""; show("vName"); };
+document.querySelectorAll(".back").forEach(b => b.onclick = () => { stopTimer(); home(); });
+
+/* ---------- اختيار الأسئلة ---------- */
+function pickDaily(){
+  // ثابتة طول اليوم لنفس الطالبة، ومركزة على الفصول الأضعف
+  // جولة جديدة كل مرة: بتتغير مع كل دخول، وما بتكررش أسئلة اتحلت النهارده
+  S.round = (S.round || 0) + 1; save();
+  if (!S.dev) { S.dev = Math.random().toString(36).slice(2); save(); }
+  const r = rng(today() + "|" + S.name + "|" + S.dev + "|" + S.round);
+  const seen = new Set((S.seen && S.seen.d === today()) ? S.seen.ids : []);
+  const w = q => { const a = acc(keyOf(q)); return a == null ? 1.2 : 0.4 + (1 - a) * 2; };
+  let src = BANK.filter(q => !seen.has(q.id)); if (src.length < 5) { src = BANK; S.seen = {d: today(), ids: []}; }
+  const pool = src.map(q => ({q, k: Math.pow(r(), 1 / w(q))})).sort((a, b) => b.k - a.k);
+  const out = [], used = new Set();
+  for (const {q} of pool) { const k = keyOf(q); if (used.has(k)) continue; used.add(k); out.push(q); if (out.length === 5) break; }
+  return out;
+}
+function pickExam(){
+  const book = shuffle(BANK.filter(q => q.s === "b")), code = shuffle(BANK.filter(q => q.s === "p"));
+  return shuffle(book.slice(0, 10).concat(code.slice(0, 10)));
+}
+
+/* ---------- الكويز ---------- */
+let Q = null, timerId = null;
+function stopTimer(){ if (timerId) { clearInterval(timerId); timerId = null; } }
+function start(mode, list, title, secs){
+  Q = {mode, list, title, i: 0, right: 0, per: {}, answered: false};
+  stopTimer(); $("qTimer").textContent = "";
+  if (secs) {
+    Q.end = Date.now() + secs * 1000;
+    const tick = () => { const left = Math.max(0, Math.round((Q.end - Date.now()) / 1000)); $("qTimer").textContent = Math.floor(left/60) + ":" + String(left % 60).padStart(2,"0"); if (!left) finish(true); };
+    tick(); timerId = setInterval(tick, 1000);
+  }
+  render(); show("vQuiz");
+}
+function render(){
+  const q = Q.list[Q.i]; Q.answered = false;
+  $("qMeta").textContent = Q.title + " · سؤال " + (Q.i + 1) + " من " + Q.list.length;
+  $("qBar").style.width = (100 * Q.i / Q.list.length) + "%";
+  $("qChap").textContent = labelOf(keyOf(q));
+  $("qText").textContent = q.code ? "إيه اللي هيظهر في وحدة التحكم؟" : q.q;
+  $("qCode").classList.toggle("hide", !q.code); $("qCode").textContent = q.code || "";
+  $("qFb").className = "fb hide"; $("qNext").classList.add("hide");
+  const order = shuffle([0,1,2,3]);
+  $("qOpts").innerHTML = "";
+  order.forEach(oi => {
+    const b = document.createElement("button"); b.type = "button";
+    b.className = "opt" + (q.code ? " mono" : ""); b.textContent = q.o[oi]; b.dataset.oi = oi;
+    b.onclick = () => answer(oi, b); $("qOpts").appendChild(b);
+  });
+}
+function answer(oi, btn){
+  if (Q.answered) return; Q.answered = true;
+  const q = Q.list[Q.i], ok = oi === q.a, k = keyOf(q);
+  if (ok) Q.right++;
+  Q.per[k] = Q.per[k] || {n:0, ok:0}; Q.per[k].n++; if (ok) Q.per[k].ok++;
+  S.stats[k] = S.stats[k] || {n:0, ok:0}; S.stats[k].n++; if (ok) S.stats[k].ok++;
+  if (!S.days.includes(today())) S.days.push(today());
+  if (!S.seen || S.seen.d !== today()) S.seen = {d: today(), ids: []};
+  if (!S.seen.ids.includes(q.id)) S.seen.ids.push(q.id);
+  save();
+  [...$("qOpts").children].forEach(b => { b.disabled = true; if (+b.dataset.oi === q.a) b.classList.add("ok"); });
+  if (!ok) btn.classList.add("no");
+  if (Q.mode !== "exam") {
+    const why = q.e || (q.code ? "الكود ده لما يشتغل بيطبع: " + q.o[q.a] : "");
+    $("qFb").className = "fb " + (ok ? "ok" : "no");
+    $("qFb").innerHTML = "<b>" + (ok ? "صح!" : "مش دي.") + "</b> ";
+    $("qFb").appendChild(document.createTextNode(why));
+  }
+  $("qNext").textContent = Q.i === Q.list.length - 1 ? "النتيجة" : "التالي";
+  $("qNext").classList.remove("hide");
+  if (Q.mode === "exam") setTimeout(next, 450);
+}
+function next(){ if (!Q) return; if (Q.i < Q.list.length - 1) { Q.i++; render(); } else finish(false); }
+$("qNext").onclick = next;
+$("qQuit").onclick = () => finish(true);
+function finish(early){
+  if (!Q) return; stopTimer();
+  const n = Q.mode === "exam" ? Q.list.length : Object.values(Q.per).reduce((s, x) => s + x.n, 0);
+  const pct = n ? Math.round(100 * Q.right / n) : 0;
+  if (Q.mode === "daily") S.daily[today()] = Q.right;
+  if (Q.mode === "exam") S.exams.push({d: today(), r: Q.right, n: Q.list.length});
+  save();
+  $("rTitle").textContent = "نتيجة " + Q.title;
+  $("rScore").textContent = Q.right + " / " + n;
+  const weak = Object.entries(Q.per).filter(([k, v]) => v.ok < v.n).sort((a, b) => a[1].ok / a[1].n - b[1].ok / b[1].n)[0];
+  $("rMsg").textContent = (pct >= 85 ? "ممتاز يا " + S.name + "! " : pct >= 50 ? "كويس، وتقدري أحسن. " : "محتاجة مراجعة، ولسه الوقت معاكي. ")
+    + (weak ? "ركزي على: " + labelOf(weak[0]).split(": ")[1] + "." : "") + (early && Q.mode === "exam" && n ? " (الامتحان خلص قبل ما تجاوبي كل الأسئلة)" : "");
+  const el = $("rChaps"); el.innerHTML = "";
+  Object.entries(Q.per).forEach(([k, v]) => { const p = Math.round(100 * v.ok / v.n); el.insertAdjacentHTML("beforeend", `<span>${labelOf(k).split(": ")[1]}</span><div class="bar"><i style="width:${p}%;${p < 50 ? "background:var(--bad)" : ""}"></i></div><span class="n">${v.ok}/${v.n}</span>`); });
+  Q.last = {title: Q.title, right: Q.right, n};
+  LAST = Q.last; Q = null;
+  show("vResult");
+}
+let LAST = null;
+
+/* ---------- البلاطات ---------- */
+$("tDaily").onclick = () => start("daily", pickDaily(), "المراجعة السريعة");
+$("tExam").onclick = () => start("exam", pickExam(), "الامتحان التجريبي", 20 * 60);
+$("tPractice").onclick = () => {
+  const s = $("pickSel"); s.innerHTML = "";
+  Object.keys(BOOK).forEach(c => s.insertAdjacentHTML("beforeend", `<option value="b${c}">الكتاب – الفصل ${c}: ${BOOK[c]}</option>`));
+  CG.forEach((g, i) => { if (BANK.some(q => q.s === "p" && grpOf(q.c) === i)) s.insertAdjacentHTML("beforeend", `<option value="p${i}">كيريو – الفصول ${g[0]}–${g[1]}: ${g[2]}</option>`); });
+  show("vPick");
+};
+$("pickGo").onclick = () => { const k = $("pickSel").value; start("practice", shuffle(BANK.filter(q => keyOf(q) === k)), "تدريب " + labelOf(k).split(": ")[1]); };
+
+/* ---------- إرسال النتيجة ---------- */
+function sendView(){
+  const keys = Object.keys(BOOK).map(c => "b" + c).concat(CG.map((g, i) => "p" + i)).filter(k => S.stats[k]);
+  const tot = keys.reduce((a, k) => [a[0] + S.stats[k].ok, a[1] + S.stats[k].n], [0, 0]);
+  const weak = keys.filter(k => S.stats[k].n >= 2).sort((a, b) => acc(a) - acc(b)).slice(0, 2).map(k => labelOf(k).split(": ")[1]);
+  const ex = S.exams[S.exams.length - 1];
+  let t = "مراجعة البرمجة – أولى ثانوي\n(" + _a + ")\nالاسم: " + S.name + "\nالتاريخ: " + today() +
+    "\nحلّيت " + tot[1] + " سؤال، الصح منهم " + tot[0] + (tot[1] ? " (" + Math.round(100 * tot[0] / tot[1]) + "%)" : "") +
+    "\nأيام المذاكرة ورا بعض: " + streak();
+  if (LAST) t += "\nآخر نشاط: " + LAST.title + " " + LAST.right + "/" + LAST.n;
+  if (ex) t += "\nآخر امتحان تجريبي: " + ex.r + "/" + ex.n + " يوم " + ex.d;
+  if (weak.length) t += "\nمحتاجة أراجع: " + weak.join("، ");
+  $("sText").textContent = t;
+  $("sWa").href = "https://wa.me/?text=" + encodeURIComponent(t);
+  $("sNote").textContent = "";
+  show("vSend");
+}
+$("tSend").onclick = sendView; $("rSend").onclick = sendView;
+$("sCopy").onclick = async () => { try { await navigator.clipboard.writeText($("sText").textContent); $("sNote").textContent = "اتنسخت. الصقيها في رسالة للمستر."; } catch(e) { $("sNote").textContent = "النسخ مش متاح هنا. علّمي على النص واختاري «نسخ»."; } };
+
+/* ---------- جرّبي الكود ---------- */
+const EX = [
+  ["مرحبا", 'console.log("أهلًا بيكم في البرمجة");\nlet name = "منة";\nconsole.log(`اسمي ${name}`);'],
+  ["حساب ومتغيرات", 'let price = 50;\nlet count = 3;\nconsole.log(price * count);\nconsole.log("5" + "5", 5 + 5);'],
+  ["if / else", 'let degree = 72;\nif (degree >= 85) {\n  console.log("ممتاز");\n} else if (degree >= 50) {\n  console.log("ناجحة");\n} else {\n  console.log("راسبة");\n}'],
+  ["for", 'for (let i = 1; i <= 5; i++) {\n  console.log(i * i);\n}'],
+  ["دالة", 'function area(l, w) {\n  return l * w;\n}\nconsole.log(area(5, 3));'],
+  ["مصفوفة", 'let degrees = [70, 45, 88, 92];\nlet sum = 0;\nfor (let d of degrees) sum += d;\nconsole.log("المتوسط", sum / degrees.length);\nconsole.log(degrees.filter(d => d >= 50));'],
+  ["while", 'let v = 1, t = 0;\nwhile (v <= 100) {\n  v *= 2;\n  t++;\n}\nconsole.log(t, v);'],
+  ["switch و %", 'for (let i = 1; i <= 15; i++) {\n  switch (i % 3) {\n    case 0: console.log(i, "يقبل القسمة على 3"); break;\n    default: break;\n  }\n}']
+];
+EX.forEach((x, i) => $("exSel").insertAdjacentHTML("beforeend", `<option value="${i}">${x[0]}</option>`));
+$("exSel").onchange = () => { $("ed").value = EX[$("exSel").value][1]; };
+$("tCode").onclick = () => { if (!$("ed").value) $("ed").value = EX[0][1]; show("vCode"); };
+$("clr").onclick = () => { $("out").textContent = ""; };
+const WORKER = `const f=v=>{if(typeof v==="string")return v;if(Array.isArray(v))return "[ "+v.map(x=>typeof x==="string"?"'"+x+"'":f(x)).join(", ")+" ]";if(v&&typeof v==="object"){try{return JSON.stringify(v)}catch(e){return String(v)}}return String(v)};
+const log=(...a)=>postMessage({t:"o",s:a.map(f).join(" ")});
+self.console={log,info:log,warn:log,error:(...a)=>postMessage({t:"e",s:a.map(f).join(" ")})};
+onmessage=e=>{try{(new Function(e.data))();postMessage({t:"d"})}catch(err){postMessage({t:"e",s:err.name+": "+err.message});postMessage({t:"d"})}};`;
+let wurl = null; try { wurl = URL.createObjectURL(new Blob([WORKER], {type: "text/javascript"})); } catch(e) {}
+$("run").onclick = () => {
+  const out = $("out"); out.textContent = "";
+  const add = (s, err) => { const sp = document.createElement("span"); if (err) sp.className = "err"; sp.textContent = s + "\n"; out.appendChild(sp); };
+  if (!wurl || typeof Worker === "undefined") { add("المتصفح ده مش بيشغّل الكود هنا. جرّبي من كروم.", true); return; }
+  let w; try { w = new Worker(wurl); } catch(e) { add("المتصفح ده مش بيشغّل الكود هنا. جرّبي من كروم.", true); return; }
+  let n = 0;
+  const kill = setTimeout(() => { w.terminate(); add("وقفناه: الكود اشتغل أكتر من ثانيتين. غالبًا في تكرار ما بيخلصش.", true); }, 2000);
+  w.onmessage = e => { const m = e.data; if (m.t === "d") { clearTimeout(kill); w.terminate(); if (!out.textContent) add("(الكود اشتغل بس ما طبعش حاجة)"); return; } if (++n > 500) { clearTimeout(kill); w.terminate(); add("وقفناه بعد 500 سطر.", true); return; } add(m.s, m.t === "e"); };
+  w.postMessage($("ed").value);
+};
+
+load(); _stamp(); home();
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { try { navigator.serviceWorker.register("sw.js").catch(() => {}); } catch(e) {} }
+</script>
+</body>
+</html>
