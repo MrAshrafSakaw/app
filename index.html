@@ -80,6 +80,7 @@ textarea.ed{direction:ltr;text-align:left;font-family:var(--f-mono);min-height:1
 @media (max-width:380px){.tiles{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:no-preference){.card{transition:border-color .2s}}
 </style>
+<script data-goatcounter="https://ashrafsakaw.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 <main>
@@ -255,7 +256,9 @@ function pickExam(){
 /* ---------- الكويز ---------- */
 let Q = null, timerId = null;
 function stopTimer(){ if (timerId) { clearInterval(timerId); timerId = null; } }
+function track(p){ try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: p, title: p, event: true}); } catch(e) {} }
 function start(mode, list, title, secs){
+  track("بدء-" + mode);
   Q = {mode, list, title, i: 0, right: 0, per: {}, answered: false};
   stopTimer(); $("qTimer").textContent = "";
   if (secs) {
@@ -339,6 +342,7 @@ $("pickGo").onclick = () => { const k = $("pickSel").value; start("practice", sh
 
 /* ---------- إرسال النتيجة ---------- */
 function sendView(){
+  track("ارسال-النتيجة");
   const keys = Object.keys(BOOK).map(c => "b" + c).concat(CG.map((g, i) => "p" + i)).filter(k => S.stats[k]);
   const tot = keys.reduce((a, k) => [a[0] + S.stats[k].ok, a[1] + S.stats[k].n], [0, 0]);
   const weak = keys.filter(k => S.stats[k].n >= 2).sort((a, b) => acc(a) - acc(b)).slice(0, 2).map(k => labelOf(k).split(": ")[1]);
@@ -370,7 +374,7 @@ const EX = [
 ];
 EX.forEach((x, i) => $("exSel").insertAdjacentHTML("beforeend", `<option value="${i}">${x[0]}</option>`));
 $("exSel").onchange = () => { $("ed").value = EX[$("exSel").value][1]; };
-$("tCode").onclick = () => { if (!$("ed").value) $("ed").value = EX[0][1]; show("vCode"); };
+$("tCode").onclick = () => { track("جربي-الكود"); if (!$("ed").value) $("ed").value = EX[0][1]; show("vCode"); };
 $("clr").onclick = () => { $("out").textContent = ""; };
 const WORKER = `const f=v=>{if(typeof v==="string")return v;if(Array.isArray(v))return "[ "+v.map(x=>typeof x==="string"?"'"+x+"'":f(x)).join(", ")+" ]";if(v&&typeof v==="object"){try{return JSON.stringify(v)}catch(e){return String(v)}}return String(v)};
 const log=(...a)=>postMessage({t:"o",s:a.map(f).join(" ")});
