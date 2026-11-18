@@ -4,10 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0f6b5c">
-<link rel="manifest" href="manifest.webmanifest">
-<script>/* آيفون: من غير manifest الأيقونة بتتحفظ بنفس الرابط اللي فيه كود المدرس */
+<script>/* الآيفون بيحفظ الأيقونة على رابط الـ manifest وبيضيّع كود المدرس، فبنضيف الـ manifest لغير الآيفون بس */
 (function(){try{var ios=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
-if(ios&&/[?&]t=/.test(location.search)){var l=document.querySelector('link[rel="manifest"]');if(l)l.parentNode.removeChild(l);}}catch(e){}})();</script>
+if(!ios){var l=document.createElement("link");l.rel="manifest";l.href="manifest.webmanifest";document.head.appendChild(l);}}catch(e){}})();</script>
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1495,11 +1494,18 @@ function setManifest(){
 /* إرسال النتايج لشيت المدرس: بتتحفظ لو مفيش نت وتتبعت لما النت يرجع */
 function outbox(rec){ if (!S.t || SHEET_URL.indexOf("http") !== 0) return; S.out = (S.out || []).concat([rec]).slice(-200); save(); flushOut(); }
 function flushOut(){
-  if (!S.t || !(S.out && S.out.length) || !navigator.onLine || SHEET_URL.indexOf("http") !== 0) return;
-  const batch = S.out.slice();
-  fetch(SHEET_URL, {method: "POST", mode: "no-cors", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify(batch)})
-    .then(() => { S.out = (S.out || []).slice(batch.length); save(); }).catch(() => {});
+  // ملاحظة: مش بنعتمد على navigator.onLine لأنه مش مضبوط في أيقونة الآيفون؛ بنحاول، ولو فشل النتايج بتفضل محفوظة
+  if (!S.t || !(S.out && S.out.length) || SHEET_URL.indexOf("http") !== 0 || flushOut.busy) return;
+  const batch = S.out.slice(), body = JSON.stringify(batch);
+  const done = () => { S.out = (S.out || []).slice(batch.length); save(); flushOut.busy = false; if (!$("vHome").classList.contains("hide")) home(); };
+  flushOut.busy = true;
+  let beacon = false;
+  try { if (navigator.sendBeacon) beacon = navigator.sendBeacon(SHEET_URL, new Blob([body], {type: "text/plain;charset=utf-8"})); } catch(e) {}
+  if (beacon) { done(); return; }
+  fetch(SHEET_URL, {method: "POST", mode: "no-cors", keepalive: true, headers: {"Content-Type": "text/plain;charset=utf-8"}, body})
+    .then(done).catch(() => { flushOut.busy = false; });
 }
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") setTimeout(flushOut, 1500); });
 window.addEventListener("online", () => setTimeout(flushOut, 2000));
 function save(){ try{ localStorage.setItem("ict1s", JSON.stringify(S)); }catch(e){} }
 const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); };
@@ -1527,7 +1533,7 @@ function home(){
   if (!S.t) $("nameNote").textContent = "الاسم بيتحفظ على موبايلك بس. ولو مدرسك اداك كود (مكتوب في الورقة أو في آخر اللينك بعد t=)، اكتبه في الخانة التانية علشان نتايجك توصله.";
   if (!S.name) { show("vName"); return; }
   $("hello").textContent = "أهلًا يا " + S.name;
-  if (S.t) $("hello").textContent += (S.out && S.out.length) ? " · " + S.out.length + " نتيجة مستنية النت علشان توصل لمدرسك" : " · نتايجك بتوصل لمدرسك";
+  if (S.t) $("hello").textContent += (S.out && S.out.length) ? " · " + S.out.length + " نتيجة مستنية النت علشان توصل لمدرسك" : " · نتايجك بتوصل لمدرسك (" + S.t + ")";
   const st = streak(); $("streak").textContent = st ? st + " يوم ورا بعض" : "سلسلة المذاكرة تبدأ النهارده";
   const done = S.daily[today()];
   $("dailyState").textContent = done != null ? "آخر جولة: " + done + " من 5 · ضغطة = 5 أسئلة جديدة" : "دقيقتين بس، والأسئلة بتركز على الفصول الأضعف";
