@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0f6b5c">
 <link rel="manifest" href="manifest.webmanifest">
+<script>/* آيفون: من غير manifest الأيقونة بتتحفظ بنفس الرابط اللي فيه كود المدرس */
+(function(){try{var ios=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+if(ios&&/[?&]t=/.test(location.search)){var l=document.querySelector('link[rel="manifest"]');if(l)l.parentNode.removeChild(l);}}catch(e){}})();</script>
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1482,9 +1485,11 @@ function setManifest(){
       start_url: st, scope: base, display: "standalone", background_color: "#f4f6f5", theme_color: "#0f6b5c",
       icons: [{src: base + "icon-192.png", sizes: "192x192", type: "image/png"}, {src: base + "icon-512.png", sizes: "512x512", type: "image/png"},
               {src: base + "icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable"}]};
-    const l = document.querySelector('link[rel="manifest"]');
-    if (l) l.href = "data:application/manifest+json;charset=utf-8," + encodeURIComponent(JSON.stringify(m));
     if (!/[?&]t=/.test(location.search) && history.replaceState) history.replaceState(null, "", st);
+    const l = document.querySelector('link[rel="manifest"]');
+    const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (l && ios) l.parentNode.removeChild(l);
+    else if (l) l.href = "data:application/manifest+json;charset=utf-8," + encodeURIComponent(JSON.stringify(m));
   } catch(e) {}
 }
 /* إرسال النتايج لشيت المدرس: بتتحفظ لو مفيش نت وتتبعت لما النت يرجع */
@@ -1519,6 +1524,7 @@ function progRows(el, keys){
 function home(){
   if (S.t) { $("nameNote").textContent = "الاسم الأول واسم الأب بس. الاسم والنتايج هيتبعتوا لمدرس الحاسب بتاعك علشان يتابعك، ومحدش غيره يشوفهم."; $("nameIn").placeholder = "الاسم الأول واسم الأب"; }
   $("tIn").classList.toggle("hide", !!S.t);
+  if (!S.t) $("nameNote").textContent = "الاسم بيتحفظ على موبايلك بس. ولو مدرسك اداك كود (مكتوب في الورقة أو في آخر اللينك بعد t=)، اكتبه في الخانة التانية علشان نتايجك توصله.";
   if (!S.name) { show("vName"); return; }
   $("hello").textContent = "أهلًا يا " + S.name;
   if (S.t) $("hello").textContent += (S.out && S.out.length) ? " · " + S.out.length + " نتيجة مستنية النت علشان توصل لمدرسك" : " · نتايجك بتوصل لمدرسك";
