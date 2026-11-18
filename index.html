@@ -1494,16 +1494,24 @@ function setManifest(){
 /* إرسال النتايج لشيت المدرس: بتتحفظ لو مفيش نت وتتبعت لما النت يرجع */
 function outbox(rec){ if (!S.t || SHEET_URL.indexOf("http") !== 0) return; S.out = (S.out || []).concat([rec]).slice(-200); save(); flushOut(); }
 function flushOut(){
-  // ملاحظة: مش بنعتمد على navigator.onLine لأنه مش مضبوط في أيقونة الآيفون؛ بنحاول، ولو فشل النتايج بتفضل محفوظة
+  // كل نتيجة بتتبعت لوحدها بطلب GET (JSONP) بيرجّع تأكيد، ولو فشل نجرب POST. النتيجة ما بتتشالش غير لما نتأكد إنها وصلت.
+  // الشيت بيتجاهل التكرار بالمعرّف، فإعادة الإرسال آمنة.
   if (!S.t || !(S.out && S.out.length) || SHEET_URL.indexOf("http") !== 0 || flushOut.busy) return;
-  const batch = S.out.slice(), body = JSON.stringify(batch);
-  const done = () => { S.out = (S.out || []).slice(batch.length); save(); flushOut.busy = false; if (!$("vHome").classList.contains("hide")) home(); };
   flushOut.busy = true;
-  let beacon = false;
-  try { if (navigator.sendBeacon) beacon = navigator.sendBeacon(SHEET_URL, new Blob([body], {type: "text/plain;charset=utf-8"})); } catch(e) {}
-  if (beacon) { done(); return; }
-  fetch(SHEET_URL, {method: "POST", mode: "no-cors", keepalive: true, headers: {"Content-Type": "text/plain;charset=utf-8"}, body})
-    .then(done).catch(() => { flushOut.busy = false; });
+  const recs = S.out.slice(0, 20);
+  const drop = rec => { S.out = (S.out || []).filter(x => x !== rec && !(x.id && x.id === rec.id)); save(); };
+  const viaPost = rec => fetch(SHEET_URL, {method: "POST", mode: "no-cors", keepalive: true,
+    headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify([rec])}).then(() => drop(rec)).catch(() => {});
+  const viaGet = rec => new Promise(res => {
+    const cb = "sqcb" + Math.random().toString(36).slice(2), sc = document.createElement("script");
+    let fin = false; const end = ok => { if (fin) return; fin = true; try { delete window[cb]; } catch(e) {} sc.remove(); res(ok); };
+    window[cb] = () => end(true); sc.onerror = () => end(false); setTimeout(() => end(false), 15000);
+    if (!rec.id) rec.id = (S.dev || "x") + "-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    sc.src = SHEET_URL + "?cb=" + cb + "&d=" + encodeURIComponent(JSON.stringify([rec]));
+    document.head.appendChild(sc);
+  });
+  recs.reduce((p, rec) => p.then(() => viaGet(rec).then(ok => ok ? drop(rec) : viaPost(rec))), Promise.resolve())
+    .then(() => { flushOut.busy = false; if (!$("vHome").classList.contains("hide")) home(); });
 }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") setTimeout(flushOut, 1500); });
 window.addEventListener("online", () => setTimeout(flushOut, 2000));
@@ -1648,7 +1656,7 @@ function finish(early){
   const el = $("rChaps"); el.innerHTML = "";
   Object.entries(Q.per).forEach(([k, v]) => { const p = Math.round(100 * v.ok / v.n); el.insertAdjacentHTML("beforeend", `<span>${labelOf(k).split(": ")[1]}</span><div class="bar"><i style="width:${p}%;${p < 50 ? "background:var(--bad)" : ""}"></i></div><span class="n">${v.ok}/${v.n}</span>`); });
   Q.last = {title: Q.title, right: Q.right, n};
-  if (n) outbox({t: S.t, name: S.name, title: Q.title, right: Q.right, n, d: today() + " " + new Date().toTimeString().slice(0, 5), dev: S.dev || ""});
+  if (n) outbox({t: S.t, name: S.name, title: Q.title, right: Q.right, n, d: today() + " " + new Date().toTimeString().slice(0, 5), dev: S.dev || "", id: (S.dev || "x") + "-" + Date.now().toString(36)});
   LAST = Q.last; Q = null;
   show("vResult");
 }
