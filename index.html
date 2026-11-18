@@ -116,6 +116,7 @@ textarea.ed{direction:ltr;text-align:left;font-family:var(--f-mono);min-height:1
     <button class="tile" id="tCode" type="button"><b>تجربة الكود</b><span>كتابة JavaScript وتشغيله</span></button>
     <button class="tile" id="tSend" type="button"><b>إرسال النتيجة</b><span>للمستر على واتساب</span></button>
     <button class="tile" id="tQr" type="button"><b>كود نتيجتي</b><span>يصوّره المدرس في الفصل، من غير نت</span></button>
+    <button class="tile" id="tAsk" type="button" style="border-color:var(--gold)"><b>اسأل مستر أشرف</b><span>سؤال مش واضح؟ اتصال أو رسالة</span></button>
   </div>
   <div class="card">
     <h2>المستوى في كل جزء</h2>
@@ -179,6 +180,18 @@ textarea.ed{direction:ltr;text-align:left;font-family:var(--f-mono);min-height:1
   <p class="note" style="margin-top:0">الشاشة دي للمدرس: يصوّرها بكاميرا موبايله فتظهرله النتيجة. شغالة من غير نت.</p>
   <div style="display:flex;justify-content:center;background:#fff;border-radius:12px;padding:12px"><canvas id="qrC" width="300" height="300" style="width:100%;max-width:300px;height:auto;image-rendering:pixelated" aria-label="كود QR فيه نتيجتك"></canvas></div>
   <pre id="qrT" class="out" style="direction:rtl;text-align:right;font-family:var(--f-body);margin-top:10px"></pre>
+  <button class="back" type="button" style="margin-top:10px">رجوع</button>
+</section>
+
+<section id="vAsk" class="card hide">
+  <h2>اسأل مستر أشرف</h2>
+  <p class="note" style="margin-top:0">فيه سؤال أو فصل مش واضح؟ أو عايز تعرف أكتر عن متابعة المستوى؟</p>
+  <div style="text-align:center;font-family:var(--f-display);font-size:2rem;font-weight:700;color:var(--accent);direction:ltr;margin:10px 0">01016173145</div>
+  <div class="row" style="display:flex;gap:8px;flex-wrap:wrap">
+    <a id="aCall" class="btn btn-p" href="tel:+201016173145" style="flex:1;text-align:center;text-decoration:none">📞 اتصال</a>
+    <a id="aSms" class="btn" href="#" style="flex:1;text-align:center;text-decoration:none">✉️ رسالة SMS</a>
+  </div>
+  <p class="note">الرسالة بتتكتب جاهزة بالاسم وأضعف الفصول، والسؤال يتكتب في آخرها.</p>
   <button class="back" type="button" style="margin-top:10px">رجوع</button>
 </section>
 
@@ -1520,7 +1533,7 @@ const today = () => { const d = new Date(); return d.getFullYear() + "-" + Strin
 
 /* ---------- أدوات ---------- */
 const $ = id => document.getElementById(id);
-const views = ["vName","vHome","vPick","vQuiz","vResult","vSend","vCode","vQr"];
+const views = ["vName","vHome","vPick","vQuiz","vResult","vSend","vCode","vQr","vAsk"];
 function show(v){ views.forEach(x => $(x).classList.toggle("hide", x !== v)); window.scrollTo(0,0); }
 function rng(seed){ let h = 2166136261; for (const ch of seed) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 100000) / 100000; }; }
 function shuffle(a, r = Math.random){ a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
@@ -1691,7 +1704,7 @@ function sendView(){
   track("ارسال-النتيجة");
   const t = summaryText();
   $("sText").textContent = t;
-  $("sWa").href = "https://wa.me/?text=" + encodeURIComponent(t);
+  $("sWa").href = "https://wa.me/?text=" + encodeURIComponent(t + "\n\n📲 التطبيق مجاني ويشتغل من غير نت – مستر أشرف سقاو:\nhttps://mrashrafsakaw.github.io/app/");
   $("sNote").textContent = "";
   show("vSend");
 }
@@ -1709,8 +1722,18 @@ function qrView(){
   show("vQr");
 }
 $("tQr").onclick = qrView;
+$("tAsk").onclick = () => {
+  track("اسأل-المستر");
+  const keys = Object.keys(BOOK).map(c => "b" + c).concat(CG.map((g, i) => "p" + i)).filter(k => S.stats[k] && S.stats[k].n >= 2);
+  const weak = keys.sort((a, b) => acc(a) - acc(b)).slice(0, 2).map(k => labelOf(k).split(": ")[1]);
+  const body = "السلام عليكم يا مستر أشرف، أنا " + (S.name || "") + " من تطبيق مستر سقاو." + (weak.length ? " أضعف فصول عندي: " + weak.join("، ") + "." : "") + " سؤالي: ";
+  const ios = /iP(hone|ad|od)/.test(navigator.userAgent);
+  $("aSms").href = "sms:+201016173145" + (ios ? "&" : "?") + "body=" + encodeURIComponent(body);
+  show("vAsk");
+};
+$("aCall").onclick = () => track("اتصال-بالمستر");
 $("tSend").onclick = sendView; $("rSend").onclick = sendView;
-$("sCopy").onclick = async () => { try { await navigator.clipboard.writeText($("sText").textContent); $("sNote").textContent = "اتنسخت. الخطوة الجاية: لزقها في رسالة للمستر."; } catch(e) { $("sNote").textContent = "النسخ مش متاح هنا. الحل: تحديد النص واختيار «نسخ»."; } };
+$("sCopy").onclick = async () => { try { await navigator.clipboard.writeText($("sText").textContent + "\n\n📲 التطبيق مجاني ويشتغل من غير نت – مستر أشرف سقاو:\nhttps://mrashrafsakaw.github.io/app/"); $("sNote").textContent = "اتنسخت. الخطوة الجاية: لزقها في أي رسالة."; } catch(e) { $("sNote").textContent = "النسخ مش متاح هنا. الحل: تحديد النص واختيار «نسخ»."; } };
 
 /* ---------- تجربة الكود ---------- */
 const EX = [
