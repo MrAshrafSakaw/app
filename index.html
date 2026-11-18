@@ -95,6 +95,7 @@ textarea.ed{direction:ltr;text-align:left;font-family:var(--f-mono);min-height:1
   <h2>أهلًا! اسمك إيه؟</h2>
   <form id="nameForm" class="row">
     <input id="nameIn" placeholder="الاسم الأول واسم الأب" autocomplete="name">
+    <input id="tIn" class="hide" placeholder="كود المدرس (لو معاك)" autocomplete="off" autocapitalize="none" spellcheck="false" dir="ltr">
     <button class="btn-p" type="submit">يلا نبدأ</button>
   </form>
   <p class="note" id="nameNote">الاسم بيتحفظ على موبايلك بس، علشان يظهر في النتيجة اللي بتتبعت للمستر.</p>
@@ -1471,7 +1472,21 @@ const SHEET_URL = "https://script.google.com/macros/s/AKfycbzKMHTaTPplOGxQCPfxRE
 /* ---------- تخزين على الموبايل (ممكن يكون مش متاح) ---------- */
 let S = {name: "", stats: {}, days: [], daily: {}, exams: []};
 function load(){ try{ const v = JSON.parse(localStorage.getItem("ict1s") || "null"); if (v) S = Object.assign(S, v); }catch(e){} }
-function readTeacher(){ try { const m = /[?&]t=([a-z0-9_-]{1,30})/i.exec(location.search); if (m) { S.t = m[1].toLowerCase(); save(); } } catch(e) {} }
+function readTeacher(){ try { const m = /[?&]t=([a-z0-9_-]{1,30})/i.exec(location.search); if (m) { S.t = m[1].toLowerCase(); save(); } } catch(e) {} setManifest(); }
+/* الأيقونة على الآيفون بتفتح بذاكرة منفصلة: نخلي رابط الأيقونة نفسه شايل كود المدرس */
+function setManifest(){
+  if (!S.t) return;
+  try {
+    const base = new URL("./", location.href).href, st = base + "?t=" + encodeURIComponent(S.t);
+    const m = {name: "مستر سقاو – مراجعة البرمجة أولى ثانوي", short_name: "مستر سقاو", lang: "ar", dir: "rtl", id: base,
+      start_url: st, scope: base, display: "standalone", background_color: "#f4f6f5", theme_color: "#0f6b5c",
+      icons: [{src: base + "icon-192.png", sizes: "192x192", type: "image/png"}, {src: base + "icon-512.png", sizes: "512x512", type: "image/png"},
+              {src: base + "icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable"}]};
+    const l = document.querySelector('link[rel="manifest"]');
+    if (l) l.href = "data:application/manifest+json;charset=utf-8," + encodeURIComponent(JSON.stringify(m));
+    if (!/[?&]t=/.test(location.search) && history.replaceState) history.replaceState(null, "", st);
+  } catch(e) {}
+}
 /* إرسال النتايج لشيت المدرس: بتتحفظ لو مفيش نت وتتبعت لما النت يرجع */
 function outbox(rec){ if (!S.t || SHEET_URL.indexOf("http") !== 0) return; S.out = (S.out || []).concat([rec]).slice(-200); save(); flushOut(); }
 function flushOut(){
@@ -1503,9 +1518,10 @@ function progRows(el, keys){
 }
 function home(){
   if (S.t) { $("nameNote").textContent = "الاسم الأول واسم الأب بس. الاسم والنتايج هيتبعتوا لمدرس الحاسب بتاعك علشان يتابعك، ومحدش غيره يشوفهم."; $("nameIn").placeholder = "الاسم الأول واسم الأب"; }
+  $("tIn").classList.toggle("hide", !!S.t);
   if (!S.name) { show("vName"); return; }
   $("hello").textContent = "أهلًا يا " + S.name;
-  if (S.t) $("hello").textContent += " · نتايجك بتوصل لمدرسك";
+  if (S.t) $("hello").textContent += (S.out && S.out.length) ? " · " + S.out.length + " نتيجة مستنية النت علشان توصل لمدرسك" : " · نتايجك بتوصل لمدرسك";
   const st = streak(); $("streak").textContent = st ? st + " يوم ورا بعض" : "سلسلة المذاكرة تبدأ النهارده";
   const done = S.daily[today()];
   $("dailyState").textContent = done != null ? "آخر جولة: " + done + " من 5 · ضغطة = 5 أسئلة جديدة" : "دقيقتين بس، والأسئلة بتركز على الفصول الأضعف";
@@ -1513,7 +1529,9 @@ function home(){
   progRows($("progCode"), CG.map((g, i) => "p" + i));
   show("vHome");
 }
-$("nameForm").addEventListener("submit", e => { e.preventDefault(); const v = $("nameIn").value.trim(); if (!v) return; S.name = v; save(); home(); });
+$("nameForm").addEventListener("submit", e => { e.preventDefault(); const v = $("nameIn").value.trim(); if (!v) return; S.name = v;
+  const tc = ($("tIn").value || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 30); if (tc && !S.t) { S.t = tc; setManifest(); }
+  save(); home(); setTimeout(flushOut, 1500); });
 $("chg").onclick = () => { $("nameIn").value = S.name; S.name = ""; show("vName"); };
 document.querySelectorAll(".back").forEach(b => b.onclick = () => { stopTimer(); home(); });
 
